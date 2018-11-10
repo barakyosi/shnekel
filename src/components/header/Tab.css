@@ -1,0 +1,8 @@
+.Tab a {
+  color: white;
+  margin-left: 10px;
+}
+
+.Tab__active a {
+  color: #3da53f;
+}
