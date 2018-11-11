@@ -7,24 +7,29 @@ import {
     InputLabel,
     Select
 } from "@material-ui/core";
+import CreateCategory from './CreateCategory';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 
-const SelectField = ({input: { name, onChange, value, ...restInput },
+const SelectCategoryField = ({input: { name, onChange, value, ...restInput },
                     meta,
                     children,
                     fullWidth,
                     margin,
-                    onSelect,
                     ...rest}) => (
     <FormControl fullWidth={fullWidth} margin={margin}>
-        <InputLabel htmlFor={`Select__${name}`}>Category</InputLabel>
+        <InputLabel htmlFor={'SelectCategoryField'}>Category</InputLabel>
+
+        <CreateCategory open={value === 'CREATE'} onClose={() => onChange(null)} onCreate={(category) => onChange(category.id)} />
+
         <Select
             {...rest}
             name={name}
             error={meta.error && meta.touched}
-            inputProps={{...restInput, id: `Select__${name}`}}
+            inputProps={{...restInput, id: 'SelectCategoryField'}}
             value={value}
             onChange={onChange}
         >
+            <MenuItem key="CREATE" value="CREATE">CREATE</MenuItem>
             {children}
         </Select>
         {meta.error &&
@@ -34,4 +39,4 @@ const SelectField = ({input: { name, onChange, value, ...restInput },
     </FormControl>
 );
 
-export default SelectField;
+export default SelectCategoryField;

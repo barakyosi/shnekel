@@ -15,10 +15,24 @@ class CreateCategory extends Component {
 
     addCategory = (values) => {
         return firebase.firestore().collection('categories').add(values)
-            .then(this.closeModal)
+            .then((category) => {
+                this.props.onCreate(category);
+            })
             .catch((error) => {
                 console.error("Error adding category: ", error);
             });
+    };
+
+    updateCategory = (values) => {
+        return firebase.firestore().collection('categories').doc(this.props.editingCategory.id).update(values)
+            .then(this.closeModal)
+            .catch((error) => {
+                console.error("Error updating category: ", error);
+            });
+    };
+
+    onSubmit = (values) => {
+        return this.props.editingCategory ? this.updateCategory(values) : this.addCategory(values);
     };
 
     closeModal = () => {
@@ -26,46 +40,55 @@ class CreateCategory extends Component {
     };
 
     render() {
+        const isEdit = this.props.editingCategory;
         return (
-            <Form
-                onSubmit={this.addCategory}
-                validate={values => {
-                    const errors = {};
-                    if (!values.name) {
-                        errors.name = "Required";
-                    }
-                    return errors;
-                }}
-                render={({ handleSubmit, form, submitting }) => {
-                    return (
-                        <Dialog open={this.props.open}>
-                            <DialogTitle>Add Category</DialogTitle>
-                            <DialogContent>
-                                <form onSubmit={handleSubmit} className="CreateCategory__form">
-                                    <div>
-                                        <Field name="name" label="name" component={TextField}/>
-                                    </div>
-                                </form>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={this.closeModal} color="primary">
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSubmit} color="primary" disabled={submitting}>
-                                    Add
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
-                    );
-                }}
-            />
+            <Dialog open={this.props.open}>
+                <Form
+                    onSubmit={this.onSubmit}
+                    validate={values => {
+                        const errors = {};
+                        if (!values.name) {
+                            errors.name = "Required";
+                        }
+                        return errors;
+                    }}
+                    initialValues={{ name: isEdit ? this.props.editingCategory.name : undefined }}
+                    render={({ handleSubmit, form, submitting }) => {
+                        return (
+                            <>
+                                <DialogTitle>Add Category</DialogTitle>
+                                <DialogContent>
+                                    <form onSubmit={handleSubmit} className="CreateCategory__form">
+                                        <div>
+                                            <Field name="name" label="name" component={TextField}/>
+                                        </div>
+                                    </form>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={this.closeModal} color="primary">
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleSubmit} color="primary" disabled={submitting}>
+                                        {isEdit ? 'Update' : 'Add'}
+                                    </Button>
+                                </DialogActions>
+                            </>
+                        );
+                    }}
+                />
+            </Dialog>
         );
     }
 }
 
 CreateCategory.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func
+    open: PropTypes.bool.isRequired,
+    editingCategory: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string
+    }),
+    onClose: PropTypes.func,
+    onCreate: PropTypes.func
 };
 
 export default CreateCategory;

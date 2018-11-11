@@ -8,9 +8,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from '@material-ui/core/Button';
 import DatePicker from './DatePicker';
-import SelectField from './SelectField';
+import SelectCategoryField from './SelectCategoryField';
 import TextField from './TextField';
-import CreateCategory from './CreateCategory';
 
 import './CreateExpense.css';
 
@@ -61,7 +60,6 @@ class CreateExpense extends Component {
     render() {
         return (
             <>
-                <CreateCategory open={this.state.showCreateCategory} onClose={this.handleCloseCategoryModal} />
                 <Form
                     onSubmit={this.addMessage}
                     validate={values => {
@@ -69,7 +67,7 @@ class CreateExpense extends Component {
                         if (!values.date) {
                             errors.date = "Required";
                         }
-                        if (!values.category) {
+                        if (!values.category || values.category === 'CREATE') {
                             errors.category = "Required";
                         }
                         if (!values.notes) {
@@ -83,7 +81,7 @@ class CreateExpense extends Component {
                         return errors;
                     }}
                     initialValues={{ date: new Date() }}
-                    render={({ handleSubmit, form, submitting, values }) => {
+                    render={({ handleSubmit, form, submitting }) => {
                         return (
                             <Dialog open={this.state.open}>
                                 <DialogTitle>Add Expense</DialogTitle>
@@ -96,10 +94,8 @@ class CreateExpense extends Component {
                                     />
                                 </div>
                                 <div>
-                                    <Field name="category" component={SelectField} fullWidth>
-                                        <MenuItem value="larry">Larry</MenuItem>
-                                        <MenuItem value="moe">Moe</MenuItem>
-                                        <MenuItem value="curly">Curly</MenuItem>
+                                    <Field name="category" component={SelectCategoryField} fullWidth>
+                                        {this.state.categories.map(category => (<MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>))}
                                     </Field>
                                 </div>
                                 <div>
